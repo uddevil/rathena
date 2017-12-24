@@ -17324,10 +17324,25 @@ static int skill_cell_overlap(struct block_list *bl, va_list ap)
 		case GN_CRAZYWEED_ATK:
 			if (skill_get_unit_flag(unit->group->skill_id)&UF_CRAZYWEED_IMMUNE)
 				break;
+			// uddevil Mod - Does not remove Manhole if casted by Shadow Chaser
+			if ((sd->status.class_ == JOB_SHADOW_CHASER_T) || (sd->status.class_ == JOB_SHADOW_CHASER) || (sd->status.class_ == JOB_BABY_CHASER)) {
+				if (unit->group->skill_id != SC_MANHOLE) {
+					skill_delunit(unit);
+				}
+			} else {
+				skill_delunit(unit);
+			}
 		case HW_GANBANTEIN:
 		case LG_EARTHDRIVE:
 			// Officially songs/dances are removed
-			skill_delunit(unit);
+			// uddevil Mod - Does not remove Manhole if casted by Shadow Chaser
+			if ((sd->status.class_ == JOB_SHADOW_CHASER_T) || (sd->status.class_ == JOB_SHADOW_CHASER) || (sd->status.class_ == JOB_BABY_CHASER)) {
+				if (unit->group->skill_id != SC_MANHOLE) {
+					skill_delunit(unit);
+				}
+			} else {
+				skill_delunit(unit);
+			}
 			return 1;
 		case SA_VOLCANO:
 		case SA_DELUGE:
