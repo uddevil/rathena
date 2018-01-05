@@ -6127,6 +6127,41 @@ ACMD_FUNC(autoloot)
 }
 
 /*==========================================
+* @alootprice by uddevil
+* Turns on/off AutoLoot by price for a specific player
+*------------------------------------------*/
+ACMD_FUNC(alootprice)
+{
+	int rate;
+	nullpo_retr(-1, sd);
+	// autoloot command without value
+	if (!message || !*message)
+	{
+		if (sd->state.autolootprice)
+			rate = 0;
+		else
+			rate = 10000;
+	}
+	else {
+		double drate;
+		drate = atof(message);
+		rate = (int)(drate);
+	}
+	if (rate < 0) rate = 0;
+	if (rate > MAX_ZENY) rate = MAX_ZENY;
+
+	sd->state.autolootprice = rate;
+	if (sd->state.autolootprice) {
+		snprintf(atcmd_output, sizeof atcmd_output, "Autolooting items with sell prices %d and above.", (sd->state.autolootprice)); // Autolooting items with drop rates of %0.02f%% and below.
+		clif_displaymessage(fd, atcmd_output);
+	}
+	else
+		clif_displaymessage(fd, msg_txt(sd, 1188)); // Autoloot is now off.
+
+	return 0;
+}
+
+/*==========================================
  * @alootid
  *------------------------------------------*/
 ACMD_FUNC(autolootitem)
@@ -10282,6 +10317,7 @@ void atcommand_basecommands(void) {
 		ACMD_DEF(adopt),
 		ACMD_DEF(agitstart3),
 		ACMD_DEF(agitend3),
+		ACMD_DEF(alootprice),
 	};
 	AtCommandInfo* atcommand;
 	int i;
