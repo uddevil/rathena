@@ -5568,6 +5568,38 @@ ACMD_FUNC(storeall)
 	return 0;
 }
 
+/*==========================================
+* @getcard by [uddevil]
+* Get all card from storage
+*------------------------------------------*/
+ACMD_FUNC(getcard)
+{
+	int i;
+	struct item_data *item;
+	enum e_storage_add result;
+	nullpo_retr(-1, sd);
+
+	if (sd->state.storage_flag != 1)
+	{	//Open storage.
+		if (storage_storageopen(sd) == 1) {
+			clif_displaymessage(fd, msg_txt(sd, 1161)); // You currently cannot open your storage.
+			return -1;
+		}
+	}
+
+	for (i = 0; i < MAX_STORAGE; i++) {
+		if (sd->storage.u.items_storage[i].amount) {
+			if ((item = itemdb_exists(sd->storage.u.items_storage[i].nameid)) != NULL && item->type == IT_CARD) {
+				storage_storageget(sd, &sd->storage, i, sd->storage.u.items_storage[i].amount);
+			}
+		}
+	}
+	storage_storageclose(sd);
+
+	clif_displaymessage(fd, msg_txt(sd, 1162)); // All items stored.
+	return 0;
+}
+
 ACMD_FUNC(clearstorage)
 {
 	int i, j;
@@ -10282,6 +10314,7 @@ void atcommand_basecommands(void) {
 		ACMD_DEF(adopt),
 		ACMD_DEF(agitstart3),
 		ACMD_DEF(agitend3),
+		ACMD_DEF(getcard),
 	};
 	AtCommandInfo* atcommand;
 	int i;
