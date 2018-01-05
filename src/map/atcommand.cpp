@@ -5568,6 +5568,37 @@ ACMD_FUNC(storeall)
 	return 0;
 }
 
+/*==========================================
+ * @storecard by uddevil
+ * Put all card into storage
+ *------------------------------------------*/
+ACMD_FUNC(storecard)
+{
+	int i;
+	struct item_data *item;
+	nullpo_retr(-1, sd);
+
+	if (sd->state.storage_flag != 1)
+	{	//Open storage.
+		if( storage_storageopen(sd) == 1 ) {
+			clif_displaymessage(fd, msg_txt(sd,1161)); // You currently cannot open your storage.
+			return -1;
+		}
+	}
+	
+	for (i = 0; i < MAX_INVENTORY; i++) {
+		if (sd->inventory.u.items_inventory[i].amount) {
+			if ((item = itemdb_exists(sd->inventory.u.items_inventory[i].nameid)) != NULL && item->type == IT_CARD) {
+				storage_storageadd(sd, &sd->storage, i, sd->inventory.u.items_inventory[i].amount);
+			}
+		}
+	}
+	storage_storageclose(sd);
+
+	clif_displaymessage(fd, msg_txt(sd,1162)); // All items stored.
+	return 0;
+}
+
 ACMD_FUNC(clearstorage)
 {
 	int i, j;
@@ -10282,6 +10313,7 @@ void atcommand_basecommands(void) {
 		ACMD_DEF(adopt),
 		ACMD_DEF(agitstart3),
 		ACMD_DEF(agitend3),
+		ACMD_DEF(storecard),
 	};
 	AtCommandInfo* atcommand;
 	int i;
